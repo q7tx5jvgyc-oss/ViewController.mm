@@ -1,17 +1,16 @@
-name: Build iOS App
+name: iOS Build
 
 on:
   workflow_dispatch:
   push:
-    branches:
-      - main
+    branches: [ main ]
 
 jobs:
   build:
     runs-on: macos-latest
 
     steps:
-      - name: Checkout repo
+      - name: Checkout
         uses: actions/checkout@v4
 
       - name: Show files
@@ -20,25 +19,20 @@ jobs:
       - name: Select Xcode
         run: sudo xcode-select -s /Applications/Xcode.app
 
-      - name: Show Xcode version
-        run: xcodebuild -version
-
-      - name: List schemes
-        run: xcodebuild -list
-
-      - name: Clean build
-        run: xcodebuild clean -scheme AutoTouchApp
-
-      - name: Build app
+      - name: Create project from files (manual compile)
         run: |
-          xcodebuild \
-          -scheme AutoTouchApp \
-          -configuration Release \
-          -sdk iphonesimulator \
-          build
+          mkdir build
 
-      - name: Upload logs
+          clang++ -fobjc-arc \
+          -framework UIKit \
+          -framework Foundation \
+          main.mm \
+          AppDelegate.mm \
+          ViewController.mm \
+          -o build/app
+
+      - name: Upload output
         uses: actions/upload-artifact@v4
         with:
-          name: build-logs
-          path: ~/Library/Developer/Xcode/DerivedData/**/Logs/*
+          name: ios-build
+          path: build
