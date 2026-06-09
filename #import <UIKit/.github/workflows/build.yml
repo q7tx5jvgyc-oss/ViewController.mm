@@ -11,24 +11,25 @@ jobs:
     runs-on: macos-latest
 
     steps:
-      - name: Checkout
+      - name: Checkout repo
         uses: actions/checkout@v4
+
+      - name: Show files
+        run: ls -R
 
       - name: Select Xcode
         run: sudo xcode-select -s /Applications/Xcode.app
 
-      - name: Show Xcode Version
+      - name: Show Xcode version
         run: xcodebuild -version
 
-      - name: List Schemes
+      - name: List schemes
         run: xcodebuild -list
 
-      - name: Clean Build
-        run: |
-          xcodebuild clean \
-          -scheme AutoTouchApp
+      - name: Clean build
+        run: xcodebuild clean -scheme AutoTouchApp
 
-      - name: Build App (Simulator safe)
+      - name: Build app
         run: |
           xcodebuild \
           -scheme AutoTouchApp \
@@ -36,9 +37,8 @@ jobs:
           -sdk iphonesimulator \
           build
 
-      - name: Upload Build Logs
+      - name: Upload logs
         uses: actions/upload-artifact@v4
         with:
           name: build-logs
-          path: |
-            ~/Library/Developer/Xcode/DerivedData/**/Logs/*
+          path: ~/Library/Developer/Xcode/DerivedData/**/Logs/*
